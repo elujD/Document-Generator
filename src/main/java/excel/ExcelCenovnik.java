@@ -7,8 +7,9 @@ import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
-public class ExcelCenovnik {
+public class ExcelCenovnik implements CenovnikLookup{
     
     public static class CenovnikRow {
         public final int rb;
@@ -60,11 +61,19 @@ public class ExcelCenovnik {
         return map.get(rb);
     }
     
+    @Override
+    public Optional<CenovnikItem> findByRedniBroj(int redniBroj) {
+        CenovnikRow row = map.get(redniBroj);
+        if (row == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new CenovnikItem(row.modulUsluga, row.jedinicaMere, row.cena));
+    }
+    
     private void load(String path) {
         try (Workbook wb = new XSSFWorkbook(new FileInputStream(path))) {
             Sheet sheet = wb.getSheetAt(0);
             
-            // podaci od reda 4 (index 3)
             for (int i = 3; i <= sheet.getLastRowNum(); i++) {
                 Row r = sheet.getRow(i);
                 if (r == null) continue;
@@ -79,7 +88,8 @@ public class ExcelCenovnik {
                 int rb = (int) cRb.getNumericCellValue();
                 String modul = cModul.getStringCellValue();
                 String jm = cJm != null ? cJm.getStringCellValue() : "kom.";
-                BigDecimal cena = BigDecimal.valueOf((int) cCena.getNumericCellValue());
+                BigDecimal cena = readBigDecimal(cCena);
+                if (cena == null) continue;
                 
                 map.put(rb, new CenovnikRow(rb, modul, jm, cena));
             }
