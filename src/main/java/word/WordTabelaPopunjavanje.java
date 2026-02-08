@@ -48,6 +48,7 @@ public class WordTabelaPopunjavanje {
             setTextPreserveStyle(newRow.getCell(5), bd(s.ukupno));
         }
         
+        addUkupnoRow(table,stavke);
         table.removeRow(templateRowIndex);
     }
     
@@ -176,4 +177,32 @@ public class WordTabelaPopunjavanje {
         first.setText(replaced, 0);
     }
     
+    private static void addUkupnoRow(XWPFTable table, List<Stavka> stavke) {
+        BigDecimal ukupno = BigDecimal.ZERO;
+        
+        for (Stavka s : stavke) {
+            ukupno = ukupno.add(s.getUkupno());
+        }
+        
+        XWPFTableRow totalRow = table.createRow();
+        
+        XWPFTableCell ukupnoLabelCell = totalRow.getCell(4);
+        ukupnoLabelCell.removeParagraph(0);
+        
+        XWPFParagraph labelParagraph = ukupnoLabelCell.addParagraph();
+        labelParagraph.setAlignment(ParagraphAlignment.LEFT);
+        labelParagraph.createRun().setText("UKUPNO");
+        
+        totalRow.getCell(0).setText("");
+        totalRow.getCell(1).setText("");
+        totalRow.getCell(2).setText("");
+        totalRow.getCell(3).setText("");
+        
+        XWPFTableCell totalCell = totalRow.getCell(5);
+        totalCell.removeParagraph(0);
+        
+        XWPFParagraph totalParagraph = totalCell.addParagraph();
+        totalParagraph.setAlignment(ParagraphAlignment.RIGHT);
+        totalParagraph.createRun().setText(ukupno.toString());
+    }
 }

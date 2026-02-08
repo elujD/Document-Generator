@@ -38,7 +38,7 @@ public class ZapisnikService {
         repl.put("{{DATUM}}", metadata.getDatumFormatiranDot());
         repl.put("{{DATUM1}}", metadata.getDatumFormatiranSlash());
         repl.put("{{K}}", metadata.getKBroj());
-        repl.put("{{BROJ}}", metadata.getBroj());
+        repl.put("{{BROJ}}", metadata.getBroj()+"-"+metadata.getDatumFormatiranDot().substring(8,10));
         repl.put("{{RASKRSNICA}}", metadata.getNazivRaskrsnice());
         
         WordTabelaPopunjavanje.fillMetadata(doc, repl);

@@ -24,4 +24,8 @@ public class Stavka {
         this.cena = cena;
         this.ukupno = kolicina.multiply(cena);
     }
+    
+    public BigDecimal getUkupno() {
+        return ukupno;
+    }
 }
