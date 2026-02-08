@@ -5,6 +5,10 @@ import org.apache.poi.xwpf.usermodel.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+import java.math.RoundingMode;
 
 public class WordTabelaPopunjavanje {
     
@@ -44,8 +48,8 @@ public class WordTabelaPopunjavanje {
             setTextPreserveStyle(newRow.getCell(1), safe(s.modulUsluga));
             setTextPreserveStyle(newRow.getCell(2), safe(s.jedinicaMere));
             setTextPreserveStyle(newRow.getCell(3), bd(s.kolicina));
-            setTextPreserveStyle(newRow.getCell(4), bd(s.cena));
-            setTextPreserveStyle(newRow.getCell(5), bd(s.ukupno));
+            setTextPreserveStyle(newRow.getCell(4), formatMoney(s.cena));
+            setTextPreserveStyle(newRow.getCell(5), formatMoney(s.ukupno));
         }
         
         addUkupnoRow(table,stavke);
@@ -203,6 +207,18 @@ public class WordTabelaPopunjavanje {
         
         XWPFParagraph totalParagraph = totalCell.addParagraph();
         totalParagraph.setAlignment(ParagraphAlignment.RIGHT);
-        totalParagraph.createRun().setText(ukupno.toString());
+        totalParagraph.createRun().setText(formatMoney(ukupno));
+    }
+    
+    private static final DecimalFormat MONEY_FORMAT;
+    static {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+        MONEY_FORMAT = new DecimalFormat("#,##0.00", symbols);
+        MONEY_FORMAT.setRoundingMode(RoundingMode.HALF_UP);
+    }
+    
+    private static String formatMoney(BigDecimal v) {
+        if (v == null) return "";
+        return MONEY_FORMAT.format(v);
     }
 }
