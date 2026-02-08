@@ -5,6 +5,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -53,8 +54,8 @@ public class ExcelCenovnik implements CenovnikLookup{
     
     private final Map<Integer, CenovnikRow> map = new HashMap<>();
     
-    public ExcelCenovnik(String path) {
-        load(path);
+    public ExcelCenovnik(Path path) {
+        load(String.valueOf(path));
     }
     
     public CenovnikRow get(int rb) {
