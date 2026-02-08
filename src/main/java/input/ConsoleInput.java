@@ -29,8 +29,6 @@ public class ConsoleInput {
                 DateTimeFormatter.ofPattern("dd.MM.yyyy.")
         );
         
-        LocalDate datumSlash = LocalDate.parse(datumInput, DateTimeFormatter.ofPattern("dd/MM/yyyy."));
-        
         System.out.print("Unesi K broj: ");
         String kBroj = "K" + scanner.nextLine().trim();
         
@@ -39,7 +37,6 @@ public class ConsoleInput {
         
         return new ZapisnikMetadata(
                 datum,
-                datumSlash,
                 kBroj,
                 broj,
                 nazivRaskrsnice
