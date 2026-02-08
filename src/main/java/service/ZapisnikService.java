@@ -6,9 +6,7 @@ import word.WordTabelaPopunjavanje;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ZapisnikService {
     
@@ -35,6 +33,16 @@ public class ZapisnikService {
             BigDecimal kol = kolicine.get(i);
             stavke.add(excelReaderService.napraviStavku(rb, kol));
         }
+        
+        Map<String, String> repl = new HashMap<>();
+        repl.put("{{DATUM}}", metadata.getDatumFormatiranDot());
+        repl.put("{{DATUM1}}", metadata.getDatumFormatiranSlash());
+        repl.put("{{K}}", metadata.getKBroj());
+        repl.put("{{BROJ}}", metadata.getBroj());
+        repl.put("{{RASKRSNICA}}", metadata.getNazivRaskrsnice());
+        
+        WordTabelaPopunjavanje.fillMetadata(doc, repl);
+        WordTabelaPopunjavanje.fillTable(doc, stavke);
         
         WordTabelaPopunjavanje.fillTable(doc, stavke);
     }

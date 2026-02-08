@@ -7,20 +7,17 @@ import java.time.format.DateTimeFormatter;
 
 public class ZapisnikMetadata {
     private final LocalDate datum;
-    private final LocalDate datumSlash;
     private final String kBroj;
     private final String broj;
     private final String nazivRaskrsnice;
     
     public ZapisnikMetadata(
             LocalDate datum,
-            LocalDate datumSlash,
             String kBroj,
             String broj,
             String nazivRaskrsnice
     ) {
         this.datum = datum;
-        this.datumSlash = datumSlash;
         this.kBroj = kBroj;
         this.broj = broj;
         this.nazivRaskrsnice = nazivRaskrsnice;
@@ -34,9 +31,7 @@ public class ZapisnikMetadata {
         return datum.format(DateTimeFormatter.ofPattern("dd.MM.yyyy."));
     }
     
-    public String getDatumFormatiranSlash(){
-        return datumSlash.format(DateTimeFormatter.ofPattern("dd/MM/yyyy."));
-    }
+    public String getDatumFormatiranSlash(){ return datum.format(DateTimeFormatter.ofPattern("dd/MM/yyyy.")); }
     
     public String getKBroj() {
         return kBroj;
