@@ -43,7 +43,5 @@ public class ZapisnikService {
         
         WordTabelaPopunjavanje.fillMetadata(doc, repl);
         WordTabelaPopunjavanje.fillTable(doc, stavke);
-        
-        WordTabelaPopunjavanje.fillTable(doc, stavke);
     }
 }
