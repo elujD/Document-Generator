@@ -60,13 +60,13 @@ public class ZapisniciApp {
                     int rb = readInt(sc, "Unesi R.br (0 za kraj): ");
                     if (rb == 0) break;
                     
-                    BigDecimal kolicina = readBigDecimal(sc, "Unesi količinu: ");
+                    BigDecimal kolicina = readBigDecimal(sc, "Unesi kolicinu: ");
                     redniBrojevi.add(rb);
                     kolicine.add(kolicina);
                 }
                 
                 if (redniBrojevi.isEmpty()) {
-                    System.out.println("Nisi uneo nijednu stavku. Preskačem generisanje.");
+                    System.out.println("Nisi uneo nijednu stavku. Preskacem generisanje.");
                     if (!askForAnother(sc)) break;
                     continue;
                 }
@@ -85,7 +85,7 @@ public class ZapisniciApp {
                     }
                 }
                 
-                System.out.println("Zapisnik sačuvan: " + outPath);
+                System.out.println("Zapisnik sacuvan: " + outPath);
                 
                 if (!askForAnother(sc)) {
                     break;
@@ -95,7 +95,7 @@ public class ZapisniciApp {
     }
     
     private static boolean askForAnother(Scanner sc) {
-        System.out.print("Da li želiš da napraviš još jedan zapisnik? 1-Da 2-Ne: ");
+        System.out.print("Da li zelis da napravis jos jedan zapisnik? 1-Da 2-Ne: ");
         String s = sc.nextLine().trim();
         return "1".equals(s);
     }
@@ -108,7 +108,7 @@ public class ZapisniciApp {
             try {
                 return LocalDate.parse(input, fmt);
             } catch (Exception e) {
-                System.out.println("Neispravan datum. Očekujem format: " + pattern);
+                System.out.println("Neispravan datum. Ocekujem format: " + pattern);
             }
         }
     }
@@ -120,7 +120,7 @@ public class ZapisniciApp {
             try {
                 return Integer.parseInt(s);
             } catch (Exception e) {
-                System.out.println("Neispravan broj. Pokušaj ponovo.");
+                System.out.println("Neispravan broj. Pokusaj ponovo.");
             }
         }
     }
