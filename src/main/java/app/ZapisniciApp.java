@@ -10,6 +10,7 @@ import service.ZapisnikService;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import word.WordTabelaPopunjavanje;
 
+import javax.print.PrintServiceLookup;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
@@ -19,6 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.awt.Desktop;
+import java.io.File;
 
 public class ZapisniciApp {
     
@@ -90,6 +93,15 @@ public class ZapisniciApp {
                 
                 System.out.println("Zapisnik sacuvan: " + outPath);
                 
+                if (askForPrint(sc)) {
+                    try {
+                        printWordDocument(outPath);
+                        System.out.println("Dokument je poslat na podrazumevani stampac.");
+                    } catch (Exception e) {
+                        System.out.println("Stampanje nije uspelo: " + e.getMessage());
+                    }
+                }
+                
                 if (!askForAnother(sc)) {
                     System.out.println("Ukupan zbir: "+ WordTabelaPopunjavanje.formatMoney(ukupanZbirPrograma));
                     break;
@@ -100,6 +112,12 @@ public class ZapisniciApp {
     
     private static boolean askForAnother(Scanner sc) {
         System.out.print("Da li zelis da napravis jos jedan zapisnik? 1-Da 2-Ne: ");
+        String s = sc.nextLine().trim();
+        return "1".equals(s);
+    }
+    
+    private static boolean askForPrint(Scanner sc) {
+        System.out.print("Da li zelis da odstampas zapisnik na podrazumevani stampac? 1-Da 2-Ne: ");
         String s = sc.nextLine().trim();
         return "1".equals(s);
     }
@@ -143,5 +161,28 @@ public class ZapisniciApp {
     
     private static String buildOutputFileName(ZapisnikMetadata m) {
         return m.getBroj()+".docx";
+    }
+    
+    private static void printWordDocument(Path documentPath) throws Exception {
+        if (documentPath == null) {
+            throw new IllegalArgumentException("Putanja do dokumenta ne sme biti null.");
+        }
+        
+        if (!Desktop.isDesktopSupported()) {
+            throw new UnsupportedOperationException("Desktop API nije podrzan na ovom sistemu.");
+        }
+        
+        Desktop desktop = Desktop.getDesktop();
+        
+        if (!desktop.isSupported(Desktop.Action.PRINT)) {
+            throw new UnsupportedOperationException("PRINT akcija nije podrzana na ovom sistemu.");
+        }
+        
+        File file = documentPath.toFile();
+        if (!file.exists()) {
+            throw new IllegalStateException("Dokument za stampu ne postoji: " + documentPath);
+        }
+        
+        desktop.print(file);
     }
 }

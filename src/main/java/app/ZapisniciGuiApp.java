@@ -40,9 +40,17 @@ public class ZapisniciGuiApp extends JFrame {
     private final JTextField brojField = new JTextField(12);
     private final JLabel raskrsnicaLabel = new JLabel("Naziv raskrsnice: ");
     
+    private final JTextField rbField = new JTextField(8);
+    private final JTextField kolicinaField = new JTextField(8);
+    
     private final DefaultTableModel tableModel = new DefaultTableModel(
             new Object[]{"R.br", "Količina"}, 0
-    );
+    ) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
     
     private final JTable stavkeTable = new JTable(tableModel);
     
@@ -61,7 +69,7 @@ public class ZapisniciGuiApp extends JFrame {
     private void initUi() {
         setTitle("Zapisnici");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(700, 500);
+        setSize(760, 560);
         setLocationRelativeTo(null);
         
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
@@ -109,13 +117,31 @@ public class ZapisniciGuiApp extends JFrame {
         
         mainPanel.add(topPanel, BorderLayout.NORTH);
         
+        JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
+        
+        JPanel unosStavkePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        unosStavkePanel.setBorder(BorderFactory.createTitledBorder("Unos stavke"));
+        
+        JButton dodajStavkuBtn = new JButton("Dodaj u listu");
+        dodajStavkuBtn.addActionListener(e -> dodajStavkuIzPolja());
+        
+        unosStavkePanel.add(new JLabel("R.br:"));
+        unosStavkePanel.add(rbField);
+        unosStavkePanel.add(new JLabel("Količina:"));
+        unosStavkePanel.add(kolicinaField);
+        unosStavkePanel.add(dodajStavkuBtn);
+        
+        rbField.addActionListener(e -> kolicinaField.requestFocus());
+        kolicinaField.addActionListener(e -> dodajStavkuIzPolja());
+        
+        centerPanel.add(unosStavkePanel, BorderLayout.NORTH);
+        
         JScrollPane scrollPane = new JScrollPane(stavkeTable);
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
         
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        
-        JButton addRowBtn = new JButton("Dodaj stavku");
-        addRowBtn.addActionListener(e -> tableModel.addRow(new Object[]{"", ""}));
         
         JButton removeRowBtn = new JButton("Obriši stavku");
         removeRowBtn.addActionListener(e -> obrisiSelektovanuStavku());
@@ -129,7 +155,6 @@ public class ZapisniciGuiApp extends JFrame {
         JButton noviUnosBtn = new JButton("Novi unos");
         noviUnosBtn.addActionListener(e -> resetForm());
         
-        buttonsPanel.add(addRowBtn);
         buttonsPanel.add(removeRowBtn);
         buttonsPanel.add(generisiBtn);
         buttonsPanel.add(generisiISstampaBtn);
@@ -155,6 +180,45 @@ public class ZapisniciGuiApp extends JFrame {
             }
             
             raskrsnicaLabel.setText("Naziv raskrsnice: " + nazivRaskrsnice);
+        } catch (Exception ex) {
+            showError(ex.getMessage());
+        }
+    }
+    
+    private void dodajStavkuIzPolja() {
+        try {
+            String rbText = rbField.getText().trim();
+            String kolicinaText = kolicinaField.getText().trim();
+            
+            if (rbText.isEmpty()) {
+                throw new IllegalArgumentException("R.br ne sme biti prazan.");
+            }
+            
+            if (kolicinaText.isEmpty()) {
+                throw new IllegalArgumentException("Količina ne sme biti prazna.");
+            }
+            
+            int rb = Integer.parseInt(rbText);
+            BigDecimal kolicina = new BigDecimal(kolicinaText.replace(",", "."));
+            
+            if (rb <= 0) {
+                throw new IllegalArgumentException("R.br mora biti veći od 0.");
+            }
+            
+            if (kolicina.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("Količina mora biti veća od 0.");
+            }
+            
+            excelReaderService.napraviStavku(rb, kolicina);
+            
+            tableModel.addRow(new Object[]{rb, kolicina.stripTrailingZeros().toPlainString()});
+            
+            rbField.setText("");
+            kolicinaField.setText("");
+            rbField.requestFocus();
+            
+        } catch (NumberFormatException ex) {
+            showError("R.br mora biti ceo broj, a količina decimalni broj.");
         } catch (Exception ex) {
             showError(ex.getMessage());
         }
@@ -192,22 +256,8 @@ public class ZapisniciGuiApp extends JFrame {
             List<BigDecimal> kolicine = new ArrayList<>();
             
             for (int i = 0; i < tableModel.getRowCount(); i++) {
-                Object rbObj = tableModel.getValueAt(i, 0);
-                Object kolObj = tableModel.getValueAt(i, 1);
-                
-                String rbText = rbObj == null ? "" : rbObj.toString().trim();
-                String kolText = kolObj == null ? "" : kolObj.toString().trim();
-                
-                if (rbText.isEmpty() && kolText.isEmpty()) {
-                    continue;
-                }
-                
-                if (rbText.isEmpty() || kolText.isEmpty()) {
-                    throw new IllegalArgumentException("Svaki red mora imati i R.br i količinu.");
-                }
-                
-                int rb = Integer.parseInt(rbText);
-                BigDecimal kolicina = new BigDecimal(kolText.replace(",", "."));
+                int rb = Integer.parseInt(tableModel.getValueAt(i, 0).toString());
+                BigDecimal kolicina = new BigDecimal(tableModel.getValueAt(i, 1).toString());
                 
                 redniBrojevi.add(rb);
                 kolicine.add(kolicina);
@@ -259,8 +309,11 @@ public class ZapisniciGuiApp extends JFrame {
         datumField.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy.")));
         kBrojField.setText("");
         brojField.setText("");
+        rbField.setText("");
+        kolicinaField.setText("");
         raskrsnicaLabel.setText("Naziv raskrsnice: ");
         tableModel.setRowCount(0);
+        rbField.requestFocus();
     }
     
     private String normalizeKBroj(String input) {
