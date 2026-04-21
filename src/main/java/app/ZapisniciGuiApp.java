@@ -80,7 +80,7 @@ public class ZapisniciGuiApp extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
         
-        datumField.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy.")));
+        datumField.setText("");
         
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -131,6 +131,9 @@ public class ZapisniciGuiApp extends JFrame {
         unosStavkePanel.add(kolicinaField);
         unosStavkePanel.add(dodajStavkuBtn);
         
+        datumField.addActionListener(e -> kBrojField.requestFocus());
+        kBrojField.addActionListener(e -> brojField.requestFocus());
+        brojField.addActionListener(e -> rbField.requestFocus());
         rbField.addActionListener(e -> kolicinaField.requestFocus());
         kolicinaField.addActionListener(e -> dodajStavkuIzPolja());
         
@@ -299,6 +302,7 @@ public class ZapisniciGuiApp extends JFrame {
                     "Uspeh",
                     JOptionPane.INFORMATION_MESSAGE
             );
+            resetForm();
             
         } catch (Exception ex) {
             showError(ex.getMessage());
@@ -306,14 +310,14 @@ public class ZapisniciGuiApp extends JFrame {
     }
     
     private void resetForm() {
-        datumField.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy.")));
+        datumField.setText("");
         kBrojField.setText("");
         brojField.setText("");
         rbField.setText("");
         kolicinaField.setText("");
         raskrsnicaLabel.setText("Naziv raskrsnice: ");
         tableModel.setRowCount(0);
-        rbField.requestFocus();
+        datumField.requestFocus();
     }
     
     private String normalizeKBroj(String input) {
