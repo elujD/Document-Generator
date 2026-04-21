@@ -54,6 +54,12 @@ public class ZapisniciGuiApp extends JFrame {
     
     private final JTable stavkeTable = new JTable(tableModel);
     
+    private JButton removeRowBtn;
+    private JButton generisiBtn;
+    private JButton generisiISstampaBtn;
+    private JButton noviUnosBtn;
+    private JButton dodajStavkuBtn;
+    
     private final JLabel ukupanZbirProgramaLabel = new JLabel("Ukupan zbir programa: 0.00");
     private BigDecimal ukupanZbirPrograma = BigDecimal.ZERO;
     
@@ -122,7 +128,7 @@ public class ZapisniciGuiApp extends JFrame {
         JPanel unosStavkePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         unosStavkePanel.setBorder(BorderFactory.createTitledBorder("Unos stavke"));
         
-        JButton dodajStavkuBtn = new JButton("Dodaj u listu");
+        dodajStavkuBtn = new JButton("Dodaj u listu");
         dodajStavkuBtn.addActionListener(e -> dodajStavkuIzPolja());
         
         unosStavkePanel.add(new JLabel("R.br:"));
@@ -134,10 +140,42 @@ public class ZapisniciGuiApp extends JFrame {
         datumField.addActionListener(e -> kBrojField.requestFocus());
         kBrojField.addActionListener(e -> brojField.requestFocus());
         brojField.addActionListener(e -> rbField.requestFocus());
-        rbField.addActionListener(e -> kolicinaField.requestFocus());
+        
+        rbField.addActionListener(e -> {
+            if (rbField.getText().trim().isEmpty()) {
+                generisiBtn.doClick();
+            } else {
+                kolicinaField.requestFocus();
+            }
+        });
+        
         kolicinaField.addActionListener(e -> dodajStavkuIzPolja());
         
+        InputMap rbInputMap = rbField.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap rbActionMap = rbField.getActionMap();
+        
+        rbInputMap.put(KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_ENTER,
+                java.awt.event.InputEvent.SHIFT_DOWN_MASK
+        ), "generateAndPrint");
+        
+        rbActionMap.put("generateAndPrint", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                if (rbField.getText().trim().isEmpty()) {
+                    generisiISstampaBtn.doClick();
+                } else {
+                    kolicinaField.requestFocus();
+                }
+            }
+        });
+        
         centerPanel.add(unosStavkePanel, BorderLayout.NORTH);
+        
+        stavkeTable.setRowSelectionAllowed(true);
+        stavkeTable.setColumnSelectionAllowed(false);
+        stavkeTable.setCellSelectionEnabled(false);
+        stavkeTable.setFocusable(true);
         
         JScrollPane scrollPane = new JScrollPane(stavkeTable);
         centerPanel.add(scrollPane, BorderLayout.CENTER);
@@ -146,16 +184,16 @@ public class ZapisniciGuiApp extends JFrame {
         
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         
-        JButton removeRowBtn = new JButton("Obriši stavku");
+        removeRowBtn = new JButton("Obriši stavku");
         removeRowBtn.addActionListener(e -> obrisiSelektovanuStavku());
         
-        JButton generisiBtn = new JButton("Generiši zapisnik");
+        generisiBtn = new JButton("Generiši zapisnik");
         generisiBtn.addActionListener(e -> generisiZapisnik(false));
         
-        JButton generisiISstampaBtn = new JButton("Generiši i štampaj");
+        generisiISstampaBtn = new JButton("Generiši i štampaj");
         generisiISstampaBtn.addActionListener(e -> generisiZapisnik(true));
         
-        JButton noviUnosBtn = new JButton("Novi unos");
+        noviUnosBtn = new JButton("Novi unos");
         noviUnosBtn.addActionListener(e -> resetForm());
         
         buttonsPanel.add(removeRowBtn);
@@ -168,6 +206,7 @@ public class ZapisniciGuiApp extends JFrame {
         bottomPanel.add(ukupanZbirProgramaLabel, BorderLayout.SOUTH);
         
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+        getRootPane().setDefaultButton(generisiBtn);
         
         setContentPane(mainPanel);
     }
