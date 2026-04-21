@@ -217,7 +217,7 @@ public class WordTabelaPopunjavanje {
         MONEY_FORMAT.setRoundingMode(RoundingMode.HALF_UP);
     }
     
-    private static String formatMoney(BigDecimal v) {
+    public static String formatMoney(BigDecimal v) {
         if (v == null) return "";
         return MONEY_FORMAT.format(v);
     }

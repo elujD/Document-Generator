@@ -8,6 +8,7 @@ import service.ExcelReaderService;
 import service.ZapisnikService;
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import word.WordTabelaPopunjavanje;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -35,6 +36,7 @@ public class ZapisniciApp {
             
             ExcelReaderService excelReaderService = new ExcelReaderService(cenovnikLookup, raskrsniceRepository);
             ZapisnikService zapisnikService = new ZapisnikService(excelReaderService);
+            BigDecimal ukupanZbirPrograma = BigDecimal.ZERO;
             
             while (true) {
                 LocalDate datum = readDate(sc, "Unesi datum (dd.MM.yyyy.): ", "dd.MM.yyyy.");
@@ -77,7 +79,8 @@ public class ZapisniciApp {
                 try (FileInputStream in = new FileInputStream(TEMPLATE_DOCX.toFile());
                      XWPFDocument doc = new XWPFDocument(in)) {
                     
-                    zapisnikService.generisiZapisnik(doc, metadata, redniBrojevi, kolicine);
+                    BigDecimal zbirUkupno = (zapisnikService.generisiZapisnik(doc, metadata, redniBrojevi, kolicine));
+                    ukupanZbirPrograma =ukupanZbirPrograma.add(zbirUkupno);
                     
                     OUTPUT_DIR.toFile().mkdirs();
                     try (FileOutputStream out = new FileOutputStream(outPath.toFile())) {
@@ -88,6 +91,7 @@ public class ZapisniciApp {
                 System.out.println("Zapisnik sacuvan: " + outPath);
                 
                 if (!askForAnother(sc)) {
+                    System.out.println("Ukupan zbir: "+ WordTabelaPopunjavanje.formatMoney(ukupanZbirPrograma));
                     break;
                 }
             }

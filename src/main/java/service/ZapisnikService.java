@@ -16,7 +16,7 @@ public class ZapisnikService {
         this.excelReaderService = Objects.requireNonNull(excelReaderService, "excelReaderService ne sme biti null");
     }
     
-    public void generisiZapisnik(XWPFDocument doc,
+    public BigDecimal generisiZapisnik(XWPFDocument doc,
                                  ZapisnikMetadata metadata,
                                  List<Integer> redniBrojevi,
                                  List<BigDecimal> kolicine) {
@@ -43,5 +43,12 @@ public class ZapisnikService {
         
         WordTabelaPopunjavanje.fillMetadata(doc, repl);
         WordTabelaPopunjavanje.fillTable(doc, stavke);
+        
+        BigDecimal zbirUkupno = BigDecimal.ZERO;
+        for (Stavka stavka : stavke) {
+            zbirUkupno = zbirUkupno.add(stavka.getUkupno());
+        }
+        
+        return zbirUkupno;
     }
 }
