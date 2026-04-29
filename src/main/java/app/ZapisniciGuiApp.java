@@ -395,6 +395,7 @@ public class ZapisniciGuiApp extends JFrame {
         }
         
         desktop.print(file);
+        desktop.print(file);
     }
     
     private void showError(String message) {
